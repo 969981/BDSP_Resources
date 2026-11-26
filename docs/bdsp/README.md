@@ -9,3 +9,4 @@ tags: [pokemon, bdsp, unity, unpack]
 - [[ResearchRoadmap|后续字段和图片映射]]
 
 原始目录只读；派生目录为 `Unpack/v1.3.0/`。所有实际导出以 JSONL 中源路径、SHA-256、serialized file、PathID、类型和结果哈希为准。未执行 CI 前不得宣称解包完成。PNG 验证仅代表文件可解码，不代表游戏渲染等价。
+- [[FocusedDatabase|第二阶段主数据、图片与 IL2CPP 数据库]]
