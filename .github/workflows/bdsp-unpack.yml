@@ -3,7 +3,8 @@ on:
   push:
     branches: [research/bdsp-unpack-20261126]
     paths:
-      - 'scripts/bdsp_*.py'
+      - 'scripts/bdsp_unpack.py'
+      - 'scripts/bdsp_reconcile.py'
       - 'tests/test_bdsp_unpack.py'
       - '.github/workflows/bdsp-unpack.yml'
   workflow_dispatch:

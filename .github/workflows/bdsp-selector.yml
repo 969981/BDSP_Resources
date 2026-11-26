@@ -1,0 +1,39 @@
+name: BDSP selector trace
+on:
+  push:
+    branches: [research/bdsp-unpack-20261126]
+    paths: ['scripts/bdsp_selector_trace.py', '.github/workflows/bdsp-selector.yml']
+  workflow_dispatch:
+permissions:
+  contents: read
+  actions: read
+jobs:
+  trace:
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 1
+          filter: blob:none
+          sparse-checkout: |
+            scripts
+            1.3.0/5146edd5f9d0579a488ea31d0610e859_NCA/0
+            1.3.0/5146edd5f9d0579a488ea31d0610e859_NCA/1/Data/Managed/Metadata
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      - run: pip install lz4==4.4.5 capstone==5.0.6
+      - uses: actions/download-artifact@v4
+        with:
+          name: bdsp-resource-core
+          run-id: 45782126029
+          github-token: ${{ github.token }}
+          path: core
+      - run: python scripts/bdsp_selector_trace.py --artifact core --output Unpack/v1.3.0/selector
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: bdsp-selector-evidence
+          path: Unpack/v1.3.0/selector/
+          if-no-files-found: error

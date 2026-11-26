@@ -12,3 +12,5 @@ tags: [pokemon, bdsp, unity, unpack]
 - [[FocusedDatabase|第二阶段主数据、图片与 IL2CPP 数据库]]
 
 - [[ResourceCore|第三阶段原生关联与 BDSPResourceCore]]
+
+- [[PokemonImageSelector|第四阶段原生图片选择器追踪]]
