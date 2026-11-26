@@ -1,0 +1,63 @@
+name: BDSP secondary unpack
+on:
+  push:
+    branches: [research/bdsp-unpack-20261126]
+    paths:
+      - 'scripts/bdsp_*.py'
+      - 'tests/test_bdsp_unpack.py'
+      - '.github/workflows/bdsp-unpack.yml'
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  unpack:
+    runs-on: ubuntu-latest
+    timeout-minutes: 150
+    strategy:
+      fail-fast: false
+      matrix:
+        shard: [0, 1, 2, 3, 4, 5, 6, 7]
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 1
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      - run: pip install 'UnityPy>=1.20,<2' Pillow
+      - run: python -m unittest discover -s tests -v
+      - run: python scripts/bdsp_unpack.py --output Unpack/v1.3.0/shard --shards 8 --shard ${{ matrix.shard }} --images ui --raw-fallback
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: bdsp-index-${{ matrix.shard }}
+          path: Unpack/v1.3.0/shard/_index/
+          if-no-files-found: error
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: bdsp-extracted-${{ matrix.shard }}
+          path: Unpack/v1.3.0/shard/extracted/
+          if-no-files-found: warn
+          retention-days: 7
+  reconcile:
+    if: always()
+    needs: unpack
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          sparse-checkout: scripts
+          fetch-depth: 1
+          filter: blob:none
+      - uses: actions/download-artifact@v4
+        with:
+          pattern: bdsp-index-*
+          path: artifacts
+      - run: python scripts/bdsp_reconcile.py artifacts reconciliation.json
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: bdsp-reconciliation
+          path: reconciliation.json
+          if-no-files-found: warn
